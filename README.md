@@ -146,6 +146,8 @@ openwork/
 ## Documentation
 
 - [Getting Started Guide](docs/getting-started.md) - Detailed setup instructions
+- [Architecture Guide](docs/ARCHITECTURE.md) - How the prompting and workflow system works
+- [Testing Guide](docs/TESTING.md) - Manual testing checklist
 - [Troubleshooting](docs/getting-started.md#troubleshooting) - Common issues and solutions
 
 ## Development
