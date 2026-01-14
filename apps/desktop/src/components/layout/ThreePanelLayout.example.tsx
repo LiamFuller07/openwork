@@ -38,8 +38,8 @@ export function ThreePanelLayoutExample() {
         leftTitle="Chat"
         leftIcon={<MessageSquare className="w-4 h-4" />}
         defaultLeftCollapsed={false}
-        onLeftCollapseChange={(collapsed) => {
-          console.log('Left panel collapsed:', collapsed);
+        onLeftCollapseChange={() => {
+          // Handler for left panel collapse state changes
         }}
         // Center panel: Main content/preview
         centerPanel={
@@ -122,8 +122,8 @@ export function ThreePanelLayoutExample() {
         rightTitle="Context"
         rightIcon={<Sidebar className="w-4 h-4" />}
         defaultRightCollapsed={false}
-        onRightCollapseChange={(collapsed) => {
-          console.log('Right panel collapsed:', collapsed);
+        onRightCollapseChange={() => {
+          // Handler for right panel collapse state changes
         }}
         // Unique ID for localStorage
         layoutId="main-workspace"

@@ -31,7 +31,8 @@ import type { StatCardProps } from './StatCard';
 // Verify utils
 import { cn } from '../../lib/utils';
 
-// Type check
+// Type check - ensures type imports are valid
+// @ts-expect-error - Intentionally unused for type checking only
 const _typeCheck = {
   button: null as unknown as ButtonProps,
   input: null as unknown as InputProps,
@@ -63,5 +64,3 @@ export function verifyComponents() {
     },
   };
 }
-
-console.log('✅ All imports verified successfully');

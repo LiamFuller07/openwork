@@ -18,7 +18,7 @@ import {
   Image,
   Table,
 } from 'lucide-react';
-import { useStore, type ProgressStepStatus } from '../store';
+import { useStore } from '../store';
 
 /**
  * MessageContent - Safe rendering of message content without dangerouslySetInnerHTML

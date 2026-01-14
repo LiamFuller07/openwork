@@ -12,7 +12,7 @@ interface ChatInputProps {
 
 export function ChatInput({ value, onChange, onSubmit, workingDirectory }: ChatInputProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const { setWorkingDirectory, selectedProvider, selectedModel } = useStore();
+  const { setWorkingDirectory } = useStore();
 
   // Auto-resize textarea
   useEffect(() => {
@@ -31,9 +31,14 @@ export function ChatInput({ value, onChange, onSubmit, workingDirectory }: ChatI
   };
 
   const handleSelectFolder = async () => {
-    const dir = await window.openwork?.selectDirectory();
-    if (dir) {
-      setWorkingDirectory(dir);
+    try {
+      const dir = await window.openwork?.selectDirectory();
+      if (dir) {
+        setWorkingDirectory(dir);
+      }
+    } catch (error) {
+      console.error('Failed to select directory:', error);
+      // Could show toast notification here in future
     }
   };
 

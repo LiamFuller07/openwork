@@ -122,9 +122,14 @@ export function HomeView() {
   };
 
   const handleSelectFolder = async () => {
-    const dir = await window.openwork?.selectDirectory();
-    if (dir) {
-      setWorkingDirectory(dir);
+    try {
+      const dir = await window.openwork?.selectDirectory();
+      if (dir) {
+        setWorkingDirectory(dir);
+      }
+    } catch (error) {
+      console.error('Failed to select directory:', error);
+      // Could show toast notification here in future
     }
   };
 

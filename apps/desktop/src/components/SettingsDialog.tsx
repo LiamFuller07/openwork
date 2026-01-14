@@ -15,7 +15,6 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
     setSelectedProvider,
     selectedModel,
     setSelectedModel,
-    apiKeys,
     setApiKey,
   } = useStore();
 

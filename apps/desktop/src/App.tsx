@@ -7,6 +7,7 @@ import { SettingsDialog } from './components/SettingsDialog';
 import { ClarificationDialog } from './components/ClarificationDialog';
 import { TitleBar } from './components/TitleBar';
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 /**
  * ThemeToggle Component
@@ -97,9 +98,11 @@ function AppContent() {
  */
 function App() {
   return (
-    <ThemeProvider>
-      <AppContent />
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <AppContent />
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }
 
