@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft,
@@ -124,9 +124,19 @@ export function WorkingView() {
     context: true,
   });
 
+  // Track which task we've initialized to prevent duplicates (React StrictMode runs effects twice)
+  const initializedTaskRef = useRef<string | null>(null);
+
   // Add initial task as the first user message when entering working view
   useEffect(() => {
-    if (currentTask && currentTask.status === 'pending' && messages.length === 0) {
+    if (
+      currentTask &&
+      currentTask.status === 'pending' &&
+      initializedTaskRef.current !== currentTask.id
+    ) {
+      // Mark as initialized to prevent duplicate runs
+      initializedTaskRef.current = currentTask.id;
+
       // Add the user's task as the first message
       addMessage({
         id: crypto.randomUUID(),
@@ -156,7 +166,7 @@ For now, you can continue chatting and I'll respond when the backend is connecte
         timestamp: new Date(),
       });
     }
-  }, [currentTask?.id]); // Only run when task ID changes, not on every render
+  }, [currentTask?.id]); // Only run when task ID changes
 
   const handleBack = () => {
     resetSession();
