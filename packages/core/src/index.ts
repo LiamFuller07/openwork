@@ -5,6 +5,11 @@
  * Provides task planning, progress tracking, and SDK adapter integration.
  */
 
+// Import for helper functions
+import { AgentOrchestrator } from './orchestrator.js';
+import type { JSONSchema, Tool, ToolResult } from './types.js';
+import type { Skill, SkillContext, SkillResult } from './orchestrator.js';
+
 // Types
 export type {
   Task,
@@ -30,10 +35,11 @@ export type {
   TaskArtifact,
   ProgressStep,
   ProgressStepStatus,
-  Skill,
   SkillParameter,
   ArtifactType,
 } from './types.js';
+
+export type { Skill } from './orchestrator.js';
 
 // Schemas for validation
 export {
@@ -44,8 +50,8 @@ export {
   DEFAULT_QUICK_ACTIONS,
 } from './types.js';
 
-// Core classes
-export { AgentOrchestrator } from './orchestrator.js';
+// Re-export core classes
+export { AgentOrchestrator };
 export type {
   SDKAdapter,
   Skill as OrchestratorSkill,
@@ -75,7 +81,6 @@ export function createOrchestrator(config?: {
   model?: string;
   apiKey?: string;
 }): AgentOrchestrator {
-  const { AgentOrchestrator } = require('./orchestrator.js');
   return new AgentOrchestrator(config);
 }
 

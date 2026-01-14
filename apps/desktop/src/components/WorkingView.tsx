@@ -21,6 +21,78 @@ import {
 import { useStore, type ProgressStepStatus } from '../store';
 
 /**
+ * MessageContent - Safe rendering of message content without dangerouslySetInnerHTML
+ * Parses markdown-like syntax and renders as React elements to prevent XSS
+ */
+function MessageContent({ content }: { content: string }) {
+  // Parse content into segments: text, bold, and emojis
+  const parseContent = (text: string) => {
+    const segments: Array<{ type: 'text' | 'bold' | 'emoji' | 'break'; content: string }> = [];
+    let remaining = text;
+
+    while (remaining.length > 0) {
+      // Check for newlines
+      if (remaining.startsWith('\n')) {
+        segments.push({ type: 'break', content: '' });
+        remaining = remaining.slice(1);
+        continue;
+      }
+
+      // Check for bold text
+      const boldMatch = remaining.match(/^\*\*(.+?)\*\*/);
+      if (boldMatch) {
+        segments.push({ type: 'bold', content: boldMatch[1] });
+        remaining = remaining.slice(boldMatch[0].length);
+        continue;
+      }
+
+      // Check for emojis
+      const emojiMatch = remaining.match(/^([\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2300}-\u{23FF}]|[\u{2B50}]|[\u{2705}]|[\u{274C}]|[\u{1F4C1}]|[\u{1F4CA}]|[\u{1F338}]|[\u{2714}])/u);
+      if (emojiMatch) {
+        segments.push({ type: 'emoji', content: emojiMatch[0] });
+        remaining = remaining.slice(emojiMatch[0].length);
+        continue;
+      }
+
+      // Regular text - consume until next special char
+      const nextSpecial = remaining.search(/\*\*|\n|[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2300}-\u{23FF}]|[\u{2B50}]|[\u{2705}]|[\u{274C}]|[\u{1F4C1}]|[\u{1F4CA}]|[\u{1F338}]|[\u{2714}]/u);
+      if (nextSpecial === -1) {
+        segments.push({ type: 'text', content: remaining });
+        break;
+      } else if (nextSpecial > 0) {
+        segments.push({ type: 'text', content: remaining.slice(0, nextSpecial) });
+        remaining = remaining.slice(nextSpecial);
+      } else {
+        // Edge case: consume one char to avoid infinite loop
+        segments.push({ type: 'text', content: remaining[0] });
+        remaining = remaining.slice(1);
+      }
+    }
+
+    return segments;
+  };
+
+  const segments = parseContent(content);
+
+  return (
+    <div className="text-sm whitespace-pre-wrap">
+      {segments.map((segment, i) => {
+        switch (segment.type) {
+          case 'bold':
+            return <strong key={i}>{segment.content}</strong>;
+          case 'emoji':
+            return <span key={i} className="text-lg">{segment.content}</span>;
+          case 'break':
+            return <br key={i} />;
+          default:
+            return <span key={i}>{segment.content}</span>;
+        }
+      })}
+    </div>
+  );
+}
+
+/**
  * WorkingView - Three Panel Layout
  *
  * Matches Claude Cowork Screenshot 2:
@@ -33,21 +105,16 @@ export function WorkingView() {
     currentTask,
     setViewMode,
     setCurrentTask,
-    updateTaskProgress,
     workingDirectory,
     isExecuting,
-    setIsExecuting,
     progressSteps,
-    setProgressSteps,
-    updateProgressStep,
     artifacts,
-    addArtifact,
     contextFiles,
-    setContextFiles,
     messages,
     addMessage,
     activeArtifactId,
     setActiveArtifactId,
+    resetSession,
   } = useStore();
 
   const [replyInput, setReplyInput] = useState('');
@@ -57,103 +124,42 @@ export function WorkingView() {
     context: true,
   });
 
-  // Simulate task execution (in real app, this would call the orchestrator)
+  // Add initial task as the first user message when entering working view
   useEffect(() => {
-    if (currentTask && currentTask.status === 'pending') {
-      simulateTaskExecution();
+    if (currentTask && currentTask.status === 'pending' && messages.length === 0) {
+      // Add the user's task as the first message
+      addMessage({
+        id: crypto.randomUUID(),
+        role: 'user',
+        content: currentTask.description,
+        timestamp: new Date(),
+      });
+
+      // Mark task as in progress (waiting for orchestrator)
+      setCurrentTask({ ...currentTask, status: 'in_progress', subtasks: [] });
+
+      // Add placeholder assistant message
+      addMessage({
+        id: crypto.randomUUID(),
+        role: 'assistant',
+        content: `I'll help you with that. Let me analyze what needs to be done...
+
+**Your request:** ${currentTask.description}
+
+🔧 *The orchestrator integration is not yet connected. This is where the AI agent would:*
+• Break down your task into steps
+• Access files in your working directory
+• Execute tools and show progress
+• Generate artifacts as output
+
+For now, you can continue chatting and I'll respond when the backend is connected.`,
+        timestamp: new Date(),
+      });
     }
-  }, [currentTask]);
-
-  const simulateTaskExecution = async () => {
-    if (!currentTask) return;
-
-    setIsExecuting(true);
-
-    // Set up progress steps
-    const steps = [
-      { id: '1', label: 'Read meeting recordings', status: 'pending' as ProgressStepStatus, order: 1 },
-      { id: '2', label: 'Pull out key points', status: 'pending' as ProgressStepStatus, order: 2 },
-      { id: '3', label: 'Find action items', status: 'pending' as ProgressStepStatus, order: 3 },
-      { id: '4', label: 'Check Google Calendar', status: 'pending' as ProgressStepStatus, order: 4 },
-      { id: '5', label: 'Build standup deck', status: 'pending' as ProgressStepStatus, order: 5 },
-      { id: '6', label: 'Write summary', status: 'pending' as ProgressStepStatus, order: 6 },
-    ];
-    setProgressSteps(steps);
-
-    // Set up context files
-    setContextFiles([
-      { id: 'c1', name: 'Meeting Transcripts', path: '/docs/meetings', type: 'folder', icon: 'folder' },
-      { id: 'c2', name: 'SKILL.md', path: '/SKILL.md', type: 'file', icon: 'file' },
-      { id: 'c3', name: 'pptx-patterns.md', path: '/docs/pptx-patterns.md', type: 'file', icon: 'file' },
-      { id: 'c4', name: 'css.md', path: '/docs/css.md', type: 'file', icon: 'file' },
-      { id: 'c5', name: 'claude in chrome', path: '', type: 'integration', icon: 'globe' },
-    ]);
-
-    setCurrentTask({ ...currentTask, status: 'in_progress', subtasks: [] });
-
-    // Simulate progress through steps
-    for (let i = 0; i < steps.length; i++) {
-      updateProgressStep(steps[i].id, 'in_progress');
-      await new Promise((r) => setTimeout(r, 800 + Math.random() * 400));
-      updateProgressStep(steps[i].id, 'completed');
-
-      // Add artifacts as we go
-      if (i === 2) {
-        addArtifact({
-          id: 'a1',
-          type: 'document',
-          name: 'Meeting summaries',
-          path: '/output/meeting-summary.md',
-          icon: 'file-text',
-        });
-      }
-      if (i === 3) {
-        addArtifact({
-          id: 'a2',
-          type: 'document',
-          name: 'Action items',
-          path: '/output/action-items.md',
-          icon: 'file-text',
-        });
-      }
-      if (i === 4) {
-        addArtifact({
-          id: 'a3',
-          type: 'presentation',
-          name: 'Team standup deck',
-          path: '/output/standup-deck.pptx',
-          icon: 'presentation',
-        });
-        setActiveArtifactId('a3');
-      }
-    }
-
-    // Final message
-    addMessage({
-      id: crypto.randomUUID(),
-      role: 'assistant',
-      content: `All done! Here's your standup kit for the week:
-
-📁 meeting-summary.md
-✅ action-items.md
-📊 team-standup-deck.pptx
-
-**Quick highlights:**
-• 4 things shipped including API v2 (40% faster!)
-• 17 user interviews synthesized — onboarding came up a lot
-• Mobile launch postponed to Q2 (captured in the deck)
-
-The deck has 5 slides ready 🌸`,
-      timestamp: new Date(),
-      artifactIds: ['a1', 'a2', 'a3'],
-    });
-
-    updateTaskProgress(currentTask.id, 100, 'completed');
-    setIsExecuting(false);
-  };
+  }, [currentTask?.id]); // Only run when task ID changes, not on every render
 
   const handleBack = () => {
-    setCurrentTask(null);
+    resetSession();
     setViewMode('home');
   };
 
@@ -236,15 +242,7 @@ The deck has 5 slides ready 🌸`,
                     : 'text-[var(--fg-muted)] bg-[var(--bg-subtle)] p-3 rounded-xl'
                 }`}
               >
-                <div
-                  className="text-sm whitespace-pre-wrap"
-                  dangerouslySetInnerHTML={{
-                    __html: message.content
-                      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                      .replace(/📁|✅|📊|🌸/g, '<span class="text-lg">$&</span>')
-                      .replace(/\n/g, '<br/>'),
-                  }}
-                />
+                <MessageContent content={message.content} />
               </motion.div>
             ))}
           </AnimatePresence>

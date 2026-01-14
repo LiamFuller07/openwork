@@ -1,5 +1,5 @@
 import OpenAI from 'openai';
-import { v4 as uuidv4 } from 'uuid';
+import { generateId } from '@openwork/core';
 import {
   BaseSDKAdapter,
   type AdapterConfig,
@@ -285,7 +285,7 @@ Output format:
       function: {
         name: tool.name,
         description: tool.description,
-        parameters: tool.inputSchema,
+        parameters: tool.inputSchema as unknown as OpenAI.FunctionParameters,
       },
     }));
   }

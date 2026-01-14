@@ -144,6 +144,7 @@ interface OpenWorkState {
 
   // Reset
   reset: () => void;
+  resetSession: () => void;
 }
 
 const initialState = {
@@ -245,7 +246,23 @@ export const useStore = create<OpenWorkState>((set, get) => ({
   // Active artifact
   setActiveArtifactId: (id) => set({ activeArtifactId: id }),
 
+  // Reset entire state
   reset: () => set(initialState),
+
+  // Reset just the working session (preserves settings)
+  resetSession: () =>
+    set({
+      currentTask: null,
+      isExecuting: false,
+      progressSteps: [],
+      artifacts: [],
+      contextFiles: [],
+      messages: [],
+      activeArtifactId: null,
+      clarificationQuestion: null,
+      clarificationResponse: null,
+      inputValue: '',
+    }),
 }));
 
 // ============================================================================

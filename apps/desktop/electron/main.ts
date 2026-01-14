@@ -76,9 +76,22 @@ ipcMain.handle('get-app-version', () => {
   return app.getVersion();
 });
 
-// Open external link
+// Open external link - validate URL before opening
 ipcMain.handle('open-external', async (_, url: string) => {
-  await shell.openExternal(url);
+  // Validate URL to prevent arbitrary protocol handlers
+  try {
+    const parsedUrl = new URL(url);
+    // Only allow http and https protocols
+    if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
+      console.warn(`Blocked attempt to open non-http(s) URL: ${url}`);
+      return false;
+    }
+    await shell.openExternal(url);
+    return true;
+  } catch (error) {
+    console.error('Invalid URL provided to open-external:', error);
+    return false;
+  }
 });
 
 // Store API keys securely (in production, use keychain)

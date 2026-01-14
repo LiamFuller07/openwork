@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
-import { v4 as uuidv4 } from 'uuid';
+import { generateId } from '@openwork/core';
 import {
   BaseSDKAdapter,
   type AdapterConfig,

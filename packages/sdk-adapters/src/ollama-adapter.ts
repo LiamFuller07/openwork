@@ -1,5 +1,5 @@
 import { Ollama } from 'ollama';
-import { v4 as uuidv4 } from 'uuid';
+import { generateId } from '@openwork/core';
 import {
   BaseSDKAdapter,
   type AdapterConfig,

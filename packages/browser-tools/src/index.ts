@@ -227,7 +227,7 @@ export class BrowserAutomation {
     });
 
     this.page = await this.context.newPage();
-    this.page.setDefaultTimeout(this.config.timeout!);
+    this.page.setDefaultTimeout(this.config.timeout ?? 30000);
   }
 
   /**
@@ -324,8 +324,8 @@ export class BrowserAutomation {
     };
 
     if (includeScreenshot) {
-      const screenshot = await this.page.screenshot({ encoding: 'base64' });
-      state.screenshot = screenshot;
+      const screenshot = await this.page.screenshot();
+      state.screenshot = screenshot.toString('base64');
     }
 
     return state;
@@ -452,8 +452,8 @@ ${state.text}
     if (!this.page) return { success: false, error: 'Browser not launched' };
 
     try {
-      const screenshot = await this.page.screenshot({ encoding: 'base64' });
-      return { success: true, screenshot };
+      const screenshotBuffer = await this.page.screenshot();
+      return { success: true, screenshot: screenshotBuffer.toString('base64') };
     } catch (error) {
       return { success: false, error: String(error) };
     }

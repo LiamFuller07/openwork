@@ -528,7 +528,7 @@ Detail level: {detailLevel}`,
     id: 'create-presentation',
     name: 'Create Presentation',
     description: 'Generate a presentation from content or data',
-    category: 'creative',
+    category: 'custom',
     requiredTools: ['read_file', 'write_file'],
     promptTemplate: `Create a presentation with the following:
 - Topic: {topic}
