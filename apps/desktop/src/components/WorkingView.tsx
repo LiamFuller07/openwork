@@ -206,19 +206,19 @@ The deck has 5 slides ready 🌸`,
   const activeArtifact = artifacts.find((a) => a.id === activeArtifactId);
 
   return (
-    <div className="h-full flex bg-cream-100">
+    <div className="h-full flex bg-[var(--bg-subtle)]">
       {/* LEFT PANEL - Chat/Response */}
-      <div className="w-80 flex flex-col border-r border-cream-300/60 bg-white">
+      <div className="w-80 flex flex-col border-r border-[var(--border-default)] bg-[var(--bg-base)]">
         {/* Header */}
-        <div className="p-4 border-b border-cream-200/60 flex items-center gap-3">
+        <div className="p-4 border-b border-[var(--border-default)] flex items-center gap-3">
           <button
             onClick={handleBack}
-            className="p-2 hover:bg-cream-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-[var(--bg-subtle)] rounded-lg transition-colors"
           >
-            <ArrowLeft className="w-4 h-4 text-ink-200" />
+            <ArrowLeft className="w-4 h-4 text-[var(--fg-muted)]" />
           </button>
-          <button className="p-2 hover:bg-cream-100 rounded-lg transition-colors">
-            <Plus className="w-4 h-4 text-ink-300" />
+          <button className="p-2 hover:bg-[var(--bg-subtle)] rounded-lg transition-colors">
+            <Plus className="w-4 h-4 text-[var(--fg-muted)]" />
           </button>
         </div>
 
@@ -232,8 +232,8 @@ The deck has 5 slides ready 🌸`,
                 animate={{ opacity: 1, y: 0 }}
                 className={`${
                   message.role === 'assistant'
-                    ? 'text-ink-400'
-                    : 'text-ink-300 bg-cream-50 p-3 rounded-xl'
+                    ? 'text-[var(--fg-default)]'
+                    : 'text-[var(--fg-muted)] bg-[var(--bg-subtle)] p-3 rounded-xl'
                 }`}
               >
                 <div
@@ -250,7 +250,7 @@ The deck has 5 slides ready 🌸`,
           </AnimatePresence>
 
           {isExecuting && messages.length === 0 && (
-            <div className="flex items-center gap-2 text-ink-200">
+            <div className="flex items-center gap-2 text-[var(--fg-muted)]">
               <Loader2 className="w-4 h-4 animate-spin" />
               <span className="text-sm">Working on it...</span>
             </div>
@@ -258,10 +258,10 @@ The deck has 5 slides ready 🌸`,
         </div>
 
         {/* Reply Input */}
-        <div className="p-4 border-t border-cream-200/60">
-          <div className="flex items-center gap-2 bg-cream-50 rounded-xl px-3 py-2">
-            <button className="p-1 hover:bg-cream-200 rounded transition-colors">
-              <Plus className="w-4 h-4 text-ink-200" />
+        <div className="p-4 border-t border-[var(--border-default)]">
+          <div className="flex items-center gap-2 bg-[var(--bg-subtle)] rounded-xl px-3 py-2">
+            <button className="p-1 hover:bg-[var(--bg-muted)] rounded transition-colors">
+              <Plus className="w-4 h-4 text-[var(--fg-muted)]" />
             </button>
             <input
               type="text"
@@ -269,14 +269,14 @@ The deck has 5 slides ready 🌸`,
               onChange={(e) => setReplyInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleReply()}
               placeholder="Reply..."
-              className="flex-1 bg-transparent text-sm text-ink-400 placeholder:text-ink-100
+              className="flex-1 bg-transparent text-sm text-[var(--fg-default)] placeholder:text-[var(--fg-subtle)]
                          focus:outline-none"
             />
             <button
               onClick={handleReply}
               disabled={!replyInput.trim()}
-              className="p-2 bg-terracotta-500 text-white rounded-lg
-                         hover:bg-terracotta-600 disabled:bg-cream-300 disabled:text-ink-200
+              className="p-2 bg-[var(--accent)] text-white rounded-lg
+                         hover:bg-[var(--accent-hover)] disabled:bg-[var(--bg-muted)] disabled:text-[var(--fg-muted)]
                          transition-colors"
             >
               <Send className="w-3 h-3" />
@@ -290,24 +290,24 @@ The deck has 5 slides ready 🌸`,
         {activeArtifact ? (
           <>
             {/* Preview Header */}
-            <div className="h-12 px-4 flex items-center justify-between border-b border-cream-200/60 bg-white">
+            <div className="h-12 px-4 flex items-center justify-between border-b border-[var(--border-default)] bg-[var(--bg-base)]">
               <div className="flex items-center gap-2">
-                <span className="font-medium text-sm text-ink-400">
+                <span className="font-medium text-sm text-[var(--fg-default)]">
                   {activeArtifact.name}
                 </span>
-                <span className="text-xs text-ink-100">
+                <span className="text-xs text-[var(--fg-subtle)]">
                   ~{workingDirectory?.split('/').pop()}/outputs
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 {activeArtifact.type === 'presentation' && (
-                  <button className="flex items-center gap-1.5 px-3 py-1.5 bg-cream-100 rounded-lg text-xs text-ink-300 hover:bg-cream-200 transition-colors">
+                  <button className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--bg-subtle)] rounded-lg text-xs text-[var(--fg-muted)] hover:bg-[var(--bg-muted)] transition-colors">
                     <Presentation className="w-3 h-3" />
                     Keynote
                   </button>
                 )}
-                <button className="p-1.5 hover:bg-cream-100 rounded transition-colors">
-                  <Maximize2 className="w-4 h-4 text-ink-200" />
+                <button className="p-1.5 hover:bg-[var(--bg-subtle)] rounded transition-colors">
+                  <Maximize2 className="w-4 h-4 text-[var(--fg-muted)]" />
                 </button>
               </div>
             </div>
@@ -328,8 +328,8 @@ The deck has 5 slides ready 🌸`,
                   </div>
 
                   {/* Stats Section */}
-                  <div className="bg-white rounded-2xl p-6 shadow-sm border border-cream-200/60">
-                    <h2 className="text-lg font-medium text-ink-400 mb-4">
+                  <div className="bg-[var(--bg-base)] rounded-2xl p-6 shadow-sm border border-[var(--border-default)]">
+                    <h2 className="text-lg font-medium text-[var(--fg-default)] mb-4">
                       This week at a glance...
                     </h2>
                     <div className="grid grid-cols-3 gap-4">
@@ -354,8 +354,8 @@ The deck has 5 slides ready 🌸`,
                   </div>
                 </div>
               ) : (
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-cream-200/60">
-                  <p className="text-ink-300 text-sm">
+                <div className="bg-[var(--bg-base)] rounded-2xl p-6 shadow-sm border border-[var(--border-default)]">
+                  <p className="text-[var(--fg-muted)] text-sm">
                     Preview for {activeArtifact.name}
                   </p>
                 </div>
@@ -363,25 +363,25 @@ The deck has 5 slides ready 🌸`,
             </div>
           </>
         ) : (
-          <div className="flex-1 flex items-center justify-center text-ink-200">
+          <div className="flex-1 flex items-center justify-center text-[var(--fg-muted)]">
             <p className="text-sm">Select an artifact to preview</p>
           </div>
         )}
       </div>
 
       {/* RIGHT PANEL - Progress/Artifacts/Context */}
-      <div className="w-72 border-l border-cream-300/60 bg-white overflow-y-auto">
+      <div className="w-72 border-l border-[var(--border-default)] bg-[var(--bg-base)] overflow-y-auto">
         {/* Progress Section */}
-        <div className="border-b border-cream-200/60">
+        <div className="border-b border-[var(--border-default)]">
           <button
             onClick={() => toggleSection('progress')}
-            className="w-full px-4 py-3 flex items-center justify-between hover:bg-cream-50 transition-colors"
+            className="w-full px-4 py-3 flex items-center justify-between hover:bg-[var(--bg-subtle)] transition-colors"
           >
-            <span className="text-sm font-medium text-ink-300">Progress</span>
+            <span className="text-sm font-medium text-[var(--fg-muted)]">Progress</span>
             {expandedSections.progress ? (
-              <ChevronUp className="w-4 h-4 text-ink-200" />
+              <ChevronUp className="w-4 h-4 text-[var(--fg-muted)]" />
             ) : (
-              <ChevronDown className="w-4 h-4 text-ink-200" />
+              <ChevronDown className="w-4 h-4 text-[var(--fg-muted)]" />
             )}
           </button>
           <AnimatePresence>
@@ -395,24 +395,24 @@ The deck has 5 slides ready 🌸`,
                 {progressSteps.map((step) => (
                   <div key={step.id} className="flex items-center gap-3">
                     {step.status === 'completed' ? (
-                      <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
+                      <CheckCircle2 className="w-5 h-5 text-[var(--success)] flex-shrink-0" />
                     ) : step.status === 'in_progress' ? (
                       <div className="relative">
-                        <Loader2 className="w-5 h-5 text-terracotta-500 animate-spin flex-shrink-0" />
-                        <span className="absolute -top-1 -right-1 w-4 h-4 bg-terracotta-500 text-white text-[10px] rounded-full flex items-center justify-center font-medium">
+                        <Loader2 className="w-5 h-5 text-[var(--accent)] animate-spin flex-shrink-0" />
+                        <span className="absolute -top-1 -right-1 w-4 h-4 bg-[var(--accent)] text-white text-[10px] rounded-full flex items-center justify-center font-medium">
                           {step.order}
                         </span>
                       </div>
                     ) : (
-                      <Circle className="w-5 h-5 text-ink-100 flex-shrink-0" />
+                      <Circle className="w-5 h-5 text-[var(--fg-subtle)] flex-shrink-0" />
                     )}
                     <span
                       className={`text-sm ${
                         step.status === 'completed'
-                          ? 'text-ink-200'
+                          ? 'text-[var(--fg-muted)]'
                           : step.status === 'in_progress'
-                          ? 'text-ink-400 font-medium'
-                          : 'text-ink-200'
+                          ? 'text-[var(--fg-default)] font-medium'
+                          : 'text-[var(--fg-muted)]'
                       }`}
                     >
                       {step.label}
@@ -425,16 +425,16 @@ The deck has 5 slides ready 🌸`,
         </div>
 
         {/* Artifacts Section */}
-        <div className="border-b border-cream-200/60">
+        <div className="border-b border-[var(--border-default)]">
           <button
             onClick={() => toggleSection('artifacts')}
-            className="w-full px-4 py-3 flex items-center justify-between hover:bg-cream-50 transition-colors"
+            className="w-full px-4 py-3 flex items-center justify-between hover:bg-[var(--bg-subtle)] transition-colors"
           >
-            <span className="text-sm font-medium text-ink-300">Artifacts</span>
+            <span className="text-sm font-medium text-[var(--fg-muted)]">Artifacts</span>
             {expandedSections.artifacts ? (
-              <ChevronUp className="w-4 h-4 text-ink-200" />
+              <ChevronUp className="w-4 h-4 text-[var(--fg-muted)]" />
             ) : (
-              <ChevronDown className="w-4 h-4 text-ink-200" />
+              <ChevronDown className="w-4 h-4 text-[var(--fg-muted)]" />
             )}
           </button>
           <AnimatePresence>
@@ -446,7 +446,7 @@ The deck has 5 slides ready 🌸`,
                 className="px-4 pb-4 space-y-1"
               >
                 {artifacts.length === 0 ? (
-                  <p className="text-xs text-ink-100 py-2">
+                  <p className="text-xs text-[var(--fg-subtle)] py-2">
                     Artifacts will appear here
                   </p>
                 ) : (
@@ -456,14 +456,14 @@ The deck has 5 slides ready 🌸`,
                       onClick={() => setActiveArtifactId(artifact.id)}
                       className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-colors ${
                         activeArtifactId === artifact.id
-                          ? 'bg-cream-100'
-                          : 'hover:bg-cream-50'
+                          ? 'bg-[var(--bg-subtle)]'
+                          : 'hover:bg-[var(--bg-subtle)]'
                       }`}
                     >
-                      <span className="text-ink-300">
+                      <span className="text-[var(--fg-muted)]">
                         {getArtifactIcon(artifact.type)}
                       </span>
-                      <span className="text-sm text-ink-400 truncate">
+                      <span className="text-sm text-[var(--fg-default)] truncate">
                         {artifact.name}
                       </span>
                     </button>
@@ -478,13 +478,13 @@ The deck has 5 slides ready 🌸`,
         <div>
           <button
             onClick={() => toggleSection('context')}
-            className="w-full px-4 py-3 flex items-center justify-between hover:bg-cream-50 transition-colors"
+            className="w-full px-4 py-3 flex items-center justify-between hover:bg-[var(--bg-subtle)] transition-colors"
           >
-            <span className="text-sm font-medium text-ink-300">Context</span>
+            <span className="text-sm font-medium text-[var(--fg-muted)]">Context</span>
             {expandedSections.context ? (
-              <ChevronUp className="w-4 h-4 text-ink-200" />
+              <ChevronUp className="w-4 h-4 text-[var(--fg-muted)]" />
             ) : (
-              <ChevronDown className="w-4 h-4 text-ink-200" />
+              <ChevronDown className="w-4 h-4 text-[var(--fg-muted)]" />
             )}
           </button>
           <AnimatePresence>
@@ -496,19 +496,19 @@ The deck has 5 slides ready 🌸`,
                 className="px-4 pb-4 space-y-1"
               >
                 {contextFiles.length === 0 ? (
-                  <p className="text-xs text-ink-100 py-2">
+                  <p className="text-xs text-[var(--fg-subtle)] py-2">
                     Context files will appear here
                   </p>
                 ) : (
                   contextFiles.map((file) => (
                     <div
                       key={file.id}
-                      className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-cream-50 transition-colors"
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[var(--bg-subtle)] transition-colors"
                     >
-                      <span className="text-ink-200">
+                      <span className="text-[var(--fg-muted)]">
                         {getContextIcon(file.type)}
                       </span>
-                      <span className="text-sm text-ink-300 truncate">
+                      <span className="text-sm text-[var(--fg-muted)] truncate">
                         {file.name}
                       </span>
                     </div>

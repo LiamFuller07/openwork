@@ -44,21 +44,21 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black/30 backdrop-blur-sm" />
         <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
-                                   w-full max-w-lg bg-white rounded-2xl shadow-xl
-                                   border border-cream-300/80 p-6 animate-fade-in">
+                                   w-full max-w-lg bg-[var(--bg-base)] rounded-2xl shadow-xl
+                                   border border-[var(--border-default)] p-6 animate-fade-in">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
-            <Dialog.Title className="text-xl font-semibold text-ink-400">
+            <Dialog.Title className="text-xl font-semibold text-[var(--fg-default)]">
               Settings
             </Dialog.Title>
-            <Dialog.Close className="p-2 hover:bg-cream-100 rounded-lg transition-colors">
-              <X className="w-5 h-5 text-ink-200" />
+            <Dialog.Close className="p-2 hover:bg-[var(--bg-subtle)] rounded-lg transition-colors">
+              <X className="w-5 h-5 text-[var(--fg-muted)]" />
             </Dialog.Close>
           </div>
 
           {/* Provider Selection */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-ink-300 mb-3">
+            <label className="block text-sm font-medium text-[var(--fg-muted)] mb-3">
               AI Provider
             </label>
             <div className="grid grid-cols-3 gap-2">
@@ -68,12 +68,12 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                   onClick={() => handleProviderChange(provider.id)}
                   className={`p-3 rounded-xl border text-center transition-all ${
                     selectedProvider === provider.id
-                      ? 'border-terracotta-500 bg-terracotta-500/5'
-                      : 'border-cream-300/60 hover:border-cream-400'
+                      ? 'border-[var(--accent)] bg-[var(--accent)]/5'
+                      : 'border-[var(--border-default)] hover:border-[var(--border-strong)]'
                   }`}
                 >
-                  <div className="text-sm font-medium text-ink-400">{provider.name}</div>
-                  <div className="text-xs text-ink-100">{provider.company}</div>
+                  <div className="text-sm font-medium text-[var(--fg-default)]">{provider.name}</div>
+                  <div className="text-xs text-[var(--fg-subtle)]">{provider.company}</div>
                 </button>
               ))}
             </div>
@@ -81,33 +81,33 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 
           {/* Model Selection */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-ink-300 mb-3">
+            <label className="block text-sm font-medium text-[var(--fg-muted)] mb-3">
               Model
             </label>
             <Select.Root value={selectedModel} onValueChange={setSelectedModel}>
               <Select.Trigger className="w-full flex items-center justify-between px-4 py-3
-                                         border border-cream-300/60 rounded-xl
-                                         hover:border-cream-400 transition-colors text-left">
+                                         border border-[var(--border-default)] rounded-xl
+                                         hover:border-[var(--border-strong)] transition-colors text-left">
                 <Select.Value />
                 <Select.Icon>
-                  <ChevronDown className="w-4 h-4 text-ink-200" />
+                  <ChevronDown className="w-4 h-4 text-[var(--fg-muted)]" />
                 </Select.Icon>
               </Select.Trigger>
               <Select.Portal>
-                <Select.Content className="bg-white border border-cream-300/60 rounded-xl shadow-lg p-1 z-50">
+                <Select.Content className="bg-[var(--bg-base)] border border-[var(--border-default)] rounded-xl shadow-lg p-1 z-50">
                   <Select.Viewport>
                     {MODELS[selectedProvider].map((model) => (
                       <Select.Item
                         key={model}
                         value={model}
                         className="px-4 py-2 rounded-lg cursor-pointer
-                                   hover:bg-cream-100 outline-none
-                                   data-[highlighted]:bg-cream-100
+                                   hover:bg-[var(--bg-subtle)] outline-none
+                                   data-[highlighted]:bg-[var(--bg-subtle)]
                                    flex items-center justify-between"
                       >
                         <Select.ItemText>{model}</Select.ItemText>
                         <Select.ItemIndicator>
-                          <Check className="w-4 h-4 text-terracotta-500" />
+                          <Check className="w-4 h-4 text-[var(--accent)]" />
                         </Select.ItemIndicator>
                       </Select.Item>
                     ))}
@@ -119,7 +119,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 
           {/* API Keys */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-ink-300 mb-3">
+            <label className="block text-sm font-medium text-[var(--fg-muted)] mb-3">
               API Keys
             </label>
             <div className="space-y-3">
@@ -133,12 +133,12 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                       onChange={(e) =>
                         setKeyInputs({ ...keyInputs, [provider.id]: e.target.value })
                       }
-                      className="w-full px-4 py-2.5 pr-10 border border-cream-300/60 rounded-lg
-                                 focus:outline-none focus:border-terracotta-500"
+                      className="w-full px-4 py-2.5 pr-10 border border-[var(--border-default)] rounded-lg
+                                 focus:outline-none focus:border-[var(--accent)]"
                     />
                     <button
                       onClick={() => toggleShowKey(provider.id)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-200"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--fg-muted)]"
                     >
                       {showKeys[provider.id] ? (
                         <EyeOff className="w-4 h-4" />
@@ -150,31 +150,31 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                   <button
                     onClick={() => handleSaveKey(provider.id)}
                     disabled={!keyInputs[provider.id]}
-                    className="px-4 py-2.5 bg-terracotta-500 text-white rounded-lg
-                               disabled:bg-cream-400 disabled:cursor-not-allowed
-                               hover:bg-terracotta-600 transition-colors"
+                    className="px-4 py-2.5 bg-[var(--accent)] text-white rounded-lg
+                               disabled:bg-[var(--bg-muted)] disabled:text-[var(--fg-muted)] disabled:cursor-not-allowed
+                               hover:bg-[var(--accent-hover)] transition-colors"
                   >
                     Save
                   </button>
                 </div>
               ))}
             </div>
-            <p className="text-xs text-ink-100 mt-2">
+            <p className="text-xs text-[var(--fg-subtle)] mt-2">
               API keys are stored securely on your device.
             </p>
           </div>
 
           {/* Links */}
-          <div className="pt-4 border-t border-cream-200">
+          <div className="pt-4 border-t border-[var(--border-default)]">
             <div className="flex items-center justify-between text-sm">
               <button
                 onClick={() => window.openwork?.openExternal('https://github.com/openwork-ai/openwork')}
-                className="flex items-center gap-1 text-ink-200 hover:text-ink-400 transition-colors"
+                className="flex items-center gap-1 text-[var(--fg-muted)] hover:text-[var(--fg-default)] transition-colors"
               >
                 <ExternalLink className="w-4 h-4" />
                 GitHub
               </button>
-              <span className="text-ink-100">OpenWork v0.1.0</span>
+              <span className="text-[var(--fg-subtle)]">OpenWork v0.1.0</span>
             </div>
           </div>
         </Dialog.Content>
