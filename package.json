@@ -1,0 +1,51 @@
+{
+  "name": "openwork",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Open-source alternative to Claude Cowork - Universal AI agent platform",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/openwork-ai/openwork.git"
+  },
+  "keywords": [
+    "ai-agents",
+    "llm",
+    "open-source",
+    "electron",
+    "typescript",
+    "claude",
+    "gemini",
+    "openai",
+    "ollama",
+    "computer-use",
+    "browser-automation"
+  ],
+  "author": "OpenWork Contributors",
+  "license": "MIT",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "dev:desktop": "turbo run dev --filter=@openwork/desktop",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "test:e2e": "turbo run test:e2e",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "typecheck": "turbo run typecheck"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "prettier": "^3.4.0",
+    "turbo": "^2.3.0",
+    "typescript": "^5.7.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.15.0"
+}

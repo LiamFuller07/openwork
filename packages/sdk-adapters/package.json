@@ -1,0 +1,52 @@
+{
+  "name": "@openwork/sdk-adapters",
+  "version": "0.1.0",
+  "description": "Multi-provider SDK adapters for OpenWork - Claude, Gemini, OpenAI, Ollama",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./claude": {
+      "types": "./dist/claude-adapter.d.ts",
+      "import": "./dist/claude-adapter.js"
+    },
+    "./gemini": {
+      "types": "./dist/gemini-adapter.d.ts",
+      "import": "./dist/gemini-adapter.js"
+    },
+    "./openai": {
+      "types": "./dist/openai-adapter.d.ts",
+      "import": "./dist/openai-adapter.js"
+    },
+    "./ollama": {
+      "types": "./dist/ollama-adapter.d.ts",
+      "import": "./dist/ollama-adapter.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts src/claude-adapter.ts src/gemini-adapter.ts src/openai-adapter.ts src/ollama-adapter.ts --format esm --dts",
+    "dev": "tsup src/index.ts src/claude-adapter.ts src/gemini-adapter.ts src/openai-adapter.ts src/ollama-adapter.ts --format esm --dts --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.35.0",
+    "@google/generative-ai": "^0.21.0",
+    "openai": "^4.75.0",
+    "ollama": "^0.5.11"
+  },
+  "devDependencies": {
+    "tsup": "^8.3.0",
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.0"
+  },
+  "peerDependencies": {
+    "@openwork/core": "workspace:*"
+  }
+}
