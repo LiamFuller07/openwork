@@ -1,7 +1,7 @@
 {
   "name": "@openwork/browser-tools",
-  "version": "0.1.0",
-  "description": "Browser automation tools for OpenWork using browser-use and Playwright",
+  "version": "0.2.0",
+  "description": "AI-enhanced browser automation for OpenWork using Playwright (100% open source, model-agnostic)",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",

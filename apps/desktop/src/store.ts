@@ -1,8 +1,13 @@
 import { create } from 'zustand';
 
-export type AIProvider = 'claude' | 'gemini' | 'openai' | 'ollama';
+// ============================================================================
+// Core Types
+// ============================================================================
+
+export type AIProvider = 'claude' | 'openai' | 'ollama';
 export type TaskStatus = 'pending' | 'in_progress' | 'completed' | 'failed';
-export type ViewMode = 'home' | 'working' | 'settings';
+export type ViewMode = 'home' | 'working' | 'settings' | 'clarification';
+export type ProgressStepStatus = 'pending' | 'in_progress' | 'completed' | 'failed';
 
 export interface Task {
   id: string;
@@ -14,9 +19,66 @@ export interface Task {
 
 export interface ApiKeyConfig {
   claude?: string;
-  gemini?: string;
   openai?: string;
 }
+
+// ============================================================================
+// Progress & Artifacts (Working View)
+// ============================================================================
+
+export interface ProgressStep {
+  id: string;
+  label: string;
+  status: ProgressStepStatus;
+  order: number;
+}
+
+export interface Artifact {
+  id: string;
+  type: 'file' | 'presentation' | 'document' | 'data';
+  name: string;
+  path?: string;
+  icon?: string;
+}
+
+export interface ContextFile {
+  id: string;
+  name: string;
+  path: string;
+  type: 'file' | 'folder' | 'integration';
+  icon?: string;
+}
+
+export interface AgentMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+  artifactIds?: string[];
+}
+
+// ============================================================================
+// Clarification Dialog (Plan Mode)
+// ============================================================================
+
+export interface ClarificationOption {
+  id: string;
+  label: string;
+  description: string;
+  shortcut: string;
+}
+
+export interface ClarificationQuestion {
+  id: string;
+  question: string;
+  options: ClarificationOption[];
+  allowCustom: boolean;
+  allowSkip: boolean;
+}
+
+// ============================================================================
+// Store State
+// ============================================================================
 
 interface OpenWorkState {
   // View state
@@ -50,6 +112,36 @@ interface OpenWorkState {
   isExecuting: boolean;
   setIsExecuting: (executing: boolean) => void;
 
+  // Progress steps (Working View)
+  progressSteps: ProgressStep[];
+  setProgressSteps: (steps: ProgressStep[]) => void;
+  updateProgressStep: (stepId: string, status: ProgressStepStatus) => void;
+
+  // Artifacts (Working View)
+  artifacts: Artifact[];
+  setArtifacts: (artifacts: Artifact[]) => void;
+  addArtifact: (artifact: Artifact) => void;
+
+  // Context files (Working View)
+  contextFiles: ContextFile[];
+  setContextFiles: (files: ContextFile[]) => void;
+  addContextFile: (file: ContextFile) => void;
+
+  // Messages (Chat Panel)
+  messages: AgentMessage[];
+  addMessage: (message: AgentMessage) => void;
+  clearMessages: () => void;
+
+  // Clarification dialog
+  clarificationQuestion: ClarificationQuestion | null;
+  setClarificationQuestion: (question: ClarificationQuestion | null) => void;
+  clarificationResponse: string | null;
+  setClarificationResponse: (response: string | null) => void;
+
+  // Active artifact preview
+  activeArtifactId: string | null;
+  setActiveArtifactId: (id: string | null) => void;
+
   // Reset
   reset: () => void;
 }
@@ -58,11 +150,18 @@ const initialState = {
   viewMode: 'home' as ViewMode,
   workingDirectory: null,
   selectedProvider: 'claude' as AIProvider,
-  selectedModel: 'claude-sonnet-4',
+  selectedModel: 'claude-sonnet-4-20250514',
   apiKeys: {},
   currentTask: null,
   inputValue: '',
   isExecuting: false,
+  progressSteps: [],
+  artifacts: [],
+  contextFiles: [],
+  messages: [],
+  clarificationQuestion: null,
+  clarificationResponse: null,
+  activeArtifactId: null,
 };
 
 export const useStore = create<OpenWorkState>((set, get) => ({
@@ -74,8 +173,7 @@ export const useStore = create<OpenWorkState>((set, get) => ({
 
   setSelectedProvider: (provider) => {
     const modelMap: Record<AIProvider, string> = {
-      claude: 'claude-sonnet-4',
-      gemini: 'gemini-2.5-pro',
+      claude: 'claude-sonnet-4-20250514',
       openai: 'gpt-4o',
       ollama: 'llama3.3',
     };
@@ -111,20 +209,75 @@ export const useStore = create<OpenWorkState>((set, get) => ({
 
   setIsExecuting: (executing) => set({ isExecuting: executing }),
 
+  // Progress steps
+  setProgressSteps: (steps) => set({ progressSteps: steps }),
+  updateProgressStep: (stepId, status) => {
+    const { progressSteps } = get();
+    set({
+      progressSteps: progressSteps.map((step) =>
+        step.id === stepId ? { ...step, status } : step
+      ),
+    });
+  },
+
+  // Artifacts
+  setArtifacts: (artifacts) => set({ artifacts }),
+  addArtifact: (artifact) => {
+    set({ artifacts: [...get().artifacts, artifact] });
+  },
+
+  // Context files
+  setContextFiles: (files) => set({ contextFiles: files }),
+  addContextFile: (file) => {
+    set({ contextFiles: [...get().contextFiles, file] });
+  },
+
+  // Messages
+  addMessage: (message) => {
+    set({ messages: [...get().messages, message] });
+  },
+  clearMessages: () => set({ messages: [] }),
+
+  // Clarification
+  setClarificationQuestion: (question) => set({ clarificationQuestion: question }),
+  setClarificationResponse: (response) => set({ clarificationResponse: response }),
+
+  // Active artifact
+  setActiveArtifactId: (id) => set({ activeArtifactId: id }),
+
   reset: () => set(initialState),
 }));
 
-// Provider info
+// ============================================================================
+// Provider Configuration
+// ============================================================================
+
 export const PROVIDERS = [
-  { id: 'claude' as const, name: 'Claude', company: 'Anthropic', requiresKey: true },
-  { id: 'gemini' as const, name: 'Gemini', company: 'Google', requiresKey: true },
-  { id: 'openai' as const, name: 'GPT', company: 'OpenAI', requiresKey: true },
-  { id: 'ollama' as const, name: 'Local', company: 'Ollama', requiresKey: false },
+  {
+    id: 'claude' as const,
+    name: 'Claude',
+    company: 'Anthropic',
+    requiresKey: true,
+    description: 'Best for complex reasoning and file analysis',
+  },
+  {
+    id: 'openai' as const,
+    name: 'GPT',
+    company: 'OpenAI',
+    requiresKey: true,
+    description: 'Fast and capable general-purpose models',
+  },
+  {
+    id: 'ollama' as const,
+    name: 'Local',
+    company: 'Ollama',
+    requiresKey: false,
+    description: 'Run AI locally - no API key needed',
+  },
 ];
 
 export const MODELS: Record<AIProvider, string[]> = {
-  claude: ['claude-opus-4.5', 'claude-sonnet-4', 'claude-haiku-3.5'],
-  gemini: ['gemini-3-pro', 'gemini-2.5-pro', 'gemini-2.0-flash'],
-  openai: ['gpt-5', 'gpt-4o', 'o3', 'o1'],
-  ollama: ['llama3.3', 'qwen2.5', 'deepseek-r1', 'codellama'],
+  claude: ['claude-opus-4-5-20251101', 'claude-sonnet-4-20250514', 'claude-haiku-3-5-20241022'],
+  openai: ['gpt-4o', 'gpt-4o-mini', 'o3', 'o3-mini'],
+  ollama: ['llama3.3', 'llama3.2', 'qwen2.5', 'deepseek-r1', 'codellama', 'mistral'],
 };

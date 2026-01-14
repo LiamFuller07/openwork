@@ -61,7 +61,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
             <label className="block text-sm font-medium text-ink-300 mb-3">
               AI Provider
             </label>
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-3 gap-2">
               {PROVIDERS.map((provider) => (
                 <button
                   key={provider.id}

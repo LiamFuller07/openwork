@@ -24,6 +24,15 @@ export type {
   AgentResult,
   Artifact,
   QuickAction,
+  // Plan mode types
+  ClarificationQuestion,
+  ClarificationOption,
+  TaskArtifact,
+  ProgressStep,
+  ProgressStepStatus,
+  Skill,
+  SkillParameter,
+  ArtifactType,
 } from './types.js';
 
 // Schemas for validation
@@ -37,7 +46,21 @@ export {
 
 // Core classes
 export { AgentOrchestrator } from './orchestrator.js';
-export type { SDKAdapter, Skill, SkillContext, SkillResult } from './orchestrator.js';
+export type {
+  SDKAdapter,
+  Skill as OrchestratorSkill,
+  SkillContext,
+  SkillResult,
+  PlanModeState,
+  OrchestratorCallbacks,
+} from './orchestrator.js';
+
+// Plan mode prompts
+export {
+  PLAN_MODE_SYSTEM_PROMPT,
+  getProviderPromptAdditions,
+} from './orchestrator.js';
+
 export { TaskPlanner } from './task-planner.js';
 export { ProgressTracker } from './progress-tracker.js';
 
@@ -48,7 +71,7 @@ export { v4 as generateId } from 'uuid';
  * Create a new OpenWork orchestrator with default configuration
  */
 export function createOrchestrator(config?: {
-  provider?: 'claude' | 'gemini' | 'openai' | 'ollama';
+  provider?: 'claude' | 'openai' | 'ollama';
   model?: string;
   apiKey?: string;
 }): AgentOrchestrator {

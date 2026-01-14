@@ -3,10 +3,11 @@ import { useStore } from './store';
 import { HomeView } from './components/HomeView';
 import { WorkingView } from './components/WorkingView';
 import { SettingsDialog } from './components/SettingsDialog';
+import { ClarificationDialog } from './components/ClarificationDialog';
 import { TitleBar } from './components/TitleBar';
 
 function App() {
-  const { viewMode } = useStore();
+  const { viewMode, clarificationQuestion } = useStore();
   const [settingsOpen, setSettingsOpen] = useState(false);
 
   return (
@@ -22,6 +23,9 @@ function App() {
 
       {/* Settings dialog */}
       <SettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} />
+
+      {/* Plan Mode Clarification Dialog */}
+      {clarificationQuestion && <ClarificationDialog />}
     </div>
   );
 }
