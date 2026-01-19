@@ -45,3 +45,4 @@ release/
 *.tsbuildinfo
 .eslintcache
 .cache/
+.worktrees/
