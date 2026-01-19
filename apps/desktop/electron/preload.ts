@@ -37,6 +37,11 @@ const openworkAPI = {
     return ipcRenderer.invoke('is-dev');
   },
 
+  // Ollama models
+  fetchOllamaModels: (): Promise<{ success: boolean; models: string[]; error?: string }> => {
+    return ipcRenderer.invoke('fetch-ollama-models');
+  },
+
   // Platform info
   platform: process.platform,
 };

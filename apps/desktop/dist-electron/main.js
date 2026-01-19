@@ -85,3 +85,18 @@ electron.ipcMain.handle("clear-api-key", async (_, provider) => {
 electron.ipcMain.handle("is-dev", () => {
   return !!VITE_DEV_SERVER_URL;
 });
+electron.ipcMain.handle("fetch-ollama-models", async () => {
+  var _a;
+  try {
+    const response = await fetch("http://localhost:11434/api/tags");
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    const modelNames = ((_a = data.models) == null ? void 0 : _a.map((model) => model.name)) || [];
+    return { success: true, models: modelNames };
+  } catch (error) {
+    console.error("Failed to fetch Ollama models:", error);
+    return { success: false, models: [], error: String(error) };
+  }
+});

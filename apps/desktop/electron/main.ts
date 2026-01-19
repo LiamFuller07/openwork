@@ -115,3 +115,19 @@ ipcMain.handle('clear-api-key', async (_, provider: string) => {
 ipcMain.handle('is-dev', () => {
   return !!VITE_DEV_SERVER_URL;
 });
+
+// Fetch Ollama models
+ipcMain.handle('fetch-ollama-models', async () => {
+  try {
+    const response = await fetch('http://localhost:11434/api/tags');
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    const modelNames = data.models?.map((model: any) => model.name) || [];
+    return { success: true, models: modelNames };
+  } catch (error) {
+    console.error('Failed to fetch Ollama models:', error);
+    return { success: false, models: [], error: String(error) };
+  }
+});

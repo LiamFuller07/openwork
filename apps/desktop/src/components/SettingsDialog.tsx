@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import * as Select from '@radix-ui/react-select';
 import { X, Eye, EyeOff, Check, ChevronDown, ExternalLink } from 'lucide-react';
@@ -16,10 +16,45 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
     selectedModel,
     setSelectedModel,
     setApiKey,
+    ollamaModels,
+    setOllamaModels,
   } = useStore();
 
   const [showKeys, setShowKeys] = useState<Record<string, boolean>>({});
   const [keyInputs, setKeyInputs] = useState<Record<string, string>>({});
+  const [isFetchingModels, setIsFetchingModels] = useState(false);
+
+  // Fetch Ollama models when Ollama provider is selected
+  useEffect(() => {
+    const fetchOllamaModels = async () => {
+      if (selectedProvider === 'ollama' && open) {
+        setIsFetchingModels(true);
+        console.log('Fetching Ollama models...');
+        try {
+          const result = await window.openwork?.fetchOllamaModels();
+          console.log('Ollama fetch result:', result);
+          
+          if (result?.success && result.models.length > 0) {
+            console.log('Setting models:', result.models);
+            setOllamaModels(result.models);
+            
+            // If current model is not in the list, select the first one
+            if (!result.models.includes(selectedModel)) {
+              setSelectedModel(result.models[0]);
+            }
+          } else {
+            console.error('Failed to fetch models:', result?.error);
+          }
+        } catch (error) {
+          console.error('Failed to fetch Ollama models:', error);
+        } finally {
+          setIsFetchingModels(false);
+        }
+      }
+    };
+
+    fetchOllamaModels();
+  }, [selectedProvider, open]);
 
   const handleProviderChange = (provider: AIProvider) => {
     setSelectedProvider(provider);
@@ -81,12 +116,15 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
           {/* Model Selection */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-[var(--fg-muted)] mb-3">
-              Model
+              Model {isFetchingModels && selectedProvider === 'ollama' && (
+                <span className="text-xs text-[var(--fg-subtle)]"> (fetching...)</span>
+              )}
             </label>
-            <Select.Root value={selectedModel} onValueChange={setSelectedModel}>
+            <Select.Root value={selectedModel} onValueChange={setSelectedModel} disabled={isFetchingModels}>
               <Select.Trigger className="w-full flex items-center justify-between px-4 py-3
                                          border border-[var(--border-default)] rounded-xl
-                                         hover:border-[var(--border-strong)] transition-colors text-left">
+                                         hover:border-[var(--border-strong)] transition-colors text-left
+                                         disabled:opacity-50 disabled:cursor-not-allowed">
                 <Select.Value />
                 <Select.Icon>
                   <ChevronDown className="w-4 h-4 text-[var(--fg-muted)]" />
@@ -95,21 +133,27 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
               <Select.Portal>
                 <Select.Content className="bg-[var(--bg-base)] border border-[var(--border-default)] rounded-xl shadow-lg p-1 z-50">
                   <Select.Viewport>
-                    {MODELS[selectedProvider].map((model) => (
-                      <Select.Item
-                        key={model}
-                        value={model}
-                        className="px-4 py-2 rounded-lg cursor-pointer
-                                   hover:bg-[var(--bg-subtle)] outline-none
-                                   data-[highlighted]:bg-[var(--bg-subtle)]
-                                   flex items-center justify-between"
-                      >
-                        <Select.ItemText>{model}</Select.ItemText>
-                        <Select.ItemIndicator>
-                          <Check className="w-4 h-4 text-[var(--accent)]" />
-                        </Select.ItemIndicator>
-                      </Select.Item>
-                    ))}
+                    {selectedProvider === 'ollama' && ollamaModels.length === 0 && !isFetchingModels ? (
+                      <div className="px-4 py-3 text-sm text-[var(--fg-subtle)]">
+                        No models found. Install models with: ollama pull llama3.3
+                      </div>
+                    ) : (
+                      (selectedProvider === 'ollama' ? ollamaModels : MODELS[selectedProvider]).map((model) => (
+                        <Select.Item
+                          key={model}
+                          value={model}
+                          className="px-4 py-2 rounded-lg cursor-pointer
+                                     hover:bg-[var(--bg-subtle)] outline-none
+                                     data-[highlighted]:bg-[var(--bg-subtle)]
+                                     flex items-center justify-between"
+                        >
+                          <Select.ItemText>{model}</Select.ItemText>
+                          <Select.ItemIndicator>
+                            <Check className="w-4 h-4 text-[var(--accent)]" />
+                          </Select.ItemIndicator>
+                        </Select.Item>
+                      ))
+                    )}
                   </Select.Viewport>
                 </Select.Content>
               </Select.Portal>
