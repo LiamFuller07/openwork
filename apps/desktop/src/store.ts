@@ -142,6 +142,10 @@ interface OpenWorkState {
   activeArtifactId: string | null;
   setActiveArtifactId: (id: string | null) => void;
 
+  // Ollama models
+  ollamaModels: string[];
+  setOllamaModels: (models: string[]) => void;
+
   // Reset
   reset: () => void;
   resetSession: () => void;
@@ -163,6 +167,7 @@ const initialState = {
   clarificationQuestion: null,
   clarificationResponse: null,
   activeArtifactId: null,
+  ollamaModels: [],
 };
 
 export const useStore = create<OpenWorkState>((set, get) => ({
@@ -246,6 +251,9 @@ export const useStore = create<OpenWorkState>((set, get) => ({
   // Active artifact
   setActiveArtifactId: (id) => set({ activeArtifactId: id }),
 
+  // Ollama models
+  setOllamaModels: (models) => set({ ollamaModels: models }),
+
   // Reset entire state
   reset: () => set(initialState),
 
@@ -296,5 +304,10 @@ export const PROVIDERS = [
 export const MODELS: Record<AIProvider, string[]> = {
   claude: ['claude-opus-4-5-20251101', 'claude-sonnet-4-20250514', 'claude-haiku-3-5-20241022'],
   openai: ['gpt-4o', 'gpt-4o-mini', 'o3', 'o3-mini'],
-  ollama: ['llama3.3', 'llama3.2', 'qwen2.5', 'deepseek-r1', 'codellama', 'mistral'],
+  ollama: [], // Will be dynamically fetched
+};
+
+// Helper function to get Ollama models - will be called from components
+export const getOllamaModels = (dynamicModels: string[]) => {
+  return dynamicModels.length > 0 ? dynamicModels : ['llama3.3', 'llama3.2', 'qwen2.5', 'deepseek-r1', 'codellama', 'mistral'];
 };

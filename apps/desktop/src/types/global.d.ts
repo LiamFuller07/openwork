@@ -23,6 +23,9 @@ interface OpenworkAPI {
   // Development mode check
   isDev: () => Promise<boolean>;
 
+  // Ollama models
+  fetchOllamaModels: () => Promise<{ success: boolean; models: string[]; error?: string }>;
+
   // Platform info
   platform: NodeJS.Platform;
 }
