@@ -1,6 +1,13 @@
-import { app, BrowserWindow, ipcMain, dialog, shell } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog, shell, globalShortcut } from 'electron';
+import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import {
+  DEFAULT_GLOBAL_HOTKEY,
+  readHotkeySettings,
+  registerGlobalHotkey,
+  toggleWindowVisibility,
+} from './hotkey';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -12,6 +19,9 @@ process.env.VITE_PUBLIC = app.isPackaged
 
 let win: BrowserWindow | null = null;
 const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL'];
+let currentHotkey = DEFAULT_GLOBAL_HOTKEY;
+
+const getSettingsPath = () => path.join(app.getPath('userData'), 'openwork-settings.json');
 
 function createWindow() {
   win = new BrowserWindow({
@@ -35,10 +45,46 @@ function createWindow() {
   } else {
     win.loadFile(path.join(process.env.DIST!, 'index.html'));
   }
+
+  return win;
+}
+
+function saveHotkeySetting(hotkey: string) {
+  fs.writeFileSync(getSettingsPath(), JSON.stringify({ globalHotkey: hotkey }, null, 2));
+}
+
+function registerHotkey(hotkey: string) {
+  const result = registerGlobalHotkey(globalShortcut, hotkey, () => {
+    win = toggleWindowVisibility(win, createWindow);
+  }, currentHotkey);
+
+  if (!result.ok) {
+    return result;
+  }
+
+  try {
+    saveHotkeySetting(result.active);
+    currentHotkey = result.active;
+    return result;
+  } catch (error) {
+    console.error('Failed to persist global hotkey:', error);
+    currentHotkey = result.active;
+    return { ok: false, active: result.active, error: 'Failed to persist hotkey' };
+  }
 }
 
 // App lifecycle
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+  win = createWindow();
+
+  const { globalHotkey } = readHotkeySettings(
+    fs.readFileSync,
+    DEFAULT_GLOBAL_HOTKEY,
+    getSettingsPath(),
+  );
+  currentHotkey = globalHotkey;
+  registerHotkey(currentHotkey);
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
@@ -50,6 +96,10 @@ app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
   }
+});
+
+app.on('will-quit', () => {
+  globalShortcut.unregisterAll();
 });
 
 // ============================================================================
@@ -114,4 +164,16 @@ ipcMain.handle('clear-api-key', async (_, provider: string) => {
 // Check if running in development
 ipcMain.handle('is-dev', () => {
   return !!VITE_DEV_SERVER_URL;
+});
+
+ipcMain.handle('get-global-hotkey', () => {
+  return currentHotkey;
+});
+
+ipcMain.handle('set-global-hotkey', (_, hotkey: string) => {
+  return registerHotkey(hotkey);
+});
+
+ipcMain.handle('reset-global-hotkey', () => {
+  return registerHotkey(DEFAULT_GLOBAL_HOTKEY);
 });

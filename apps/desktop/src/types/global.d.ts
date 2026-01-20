@@ -20,6 +20,11 @@ interface OpenworkAPI {
   getApiKey: (provider: string) => Promise<string | null>;
   clearApiKey: (provider: string) => Promise<boolean>;
 
+  // Global hotkey
+  getGlobalHotkey: () => Promise<string>;
+  setGlobalHotkey: (hotkey: string) => Promise<{ ok: boolean; active: string; error?: string }>;
+  resetGlobalHotkey: () => Promise<{ ok: boolean; active: string; error?: string }>;
+
   // Development mode check
   isDev: () => Promise<boolean>;
 
