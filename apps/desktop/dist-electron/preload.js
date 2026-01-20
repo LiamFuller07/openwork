@@ -23,6 +23,16 @@ const openworkAPI = {
   clearApiKey: (provider) => {
     return electron.ipcRenderer.invoke("clear-api-key", provider);
   },
+  // Global hotkey
+  getGlobalHotkey: () => {
+    return electron.ipcRenderer.invoke("get-global-hotkey");
+  },
+  setGlobalHotkey: (hotkey) => {
+    return electron.ipcRenderer.invoke("set-global-hotkey", hotkey);
+  },
+  resetGlobalHotkey: () => {
+    return electron.ipcRenderer.invoke("reset-global-hotkey");
+  },
   // Development mode check
   isDev: () => {
     return electron.ipcRenderer.invoke("is-dev");

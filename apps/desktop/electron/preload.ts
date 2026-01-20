@@ -32,6 +32,21 @@ const openworkAPI = {
     return ipcRenderer.invoke('clear-api-key', provider);
   },
 
+  // Global hotkey
+  getGlobalHotkey: (): Promise<string> => {
+    return ipcRenderer.invoke('get-global-hotkey');
+  },
+
+  setGlobalHotkey: (
+    hotkey: string,
+  ): Promise<{ ok: boolean; active: string; error?: string }> => {
+    return ipcRenderer.invoke('set-global-hotkey', hotkey);
+  },
+
+  resetGlobalHotkey: (): Promise<{ ok: boolean; active: string; error?: string }> => {
+    return ipcRenderer.invoke('reset-global-hotkey');
+  },
+
   // Development mode check
   isDev: (): Promise<boolean> => {
     return ipcRenderer.invoke('is-dev');

@@ -9,6 +9,7 @@
     "build": "tsc && vite build && electron-builder",
     "build:mac": "tsc && vite build && electron-builder --mac",
     "preview": "vite preview",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist dist-electron .turbo"
   },
@@ -34,15 +35,19 @@
     "zustand": "^5.0.0"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.0",
     "autoprefixer": "^10.4.0",
     "electron": "^33.0.0",
     "electron-builder": "^25.1.0",
+    "jsdom": "^25.0.1",
     "postcss": "^8.4.0",
     "tailwindcss": "^3.4.0",
     "typescript": "^5.7.0",
+    "vitest": "^2.1.9",
     "vite": "^6.0.0",
     "vite-plugin-electron": "^0.28.0",
     "vite-plugin-electron-renderer": "^0.14.0"
